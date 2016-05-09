@@ -1,0 +1,15 @@
+{
+ "name": "echoHostname",
+ "version": "0.0.0",
+ "description": "Echo IP/Hostname information back to connecting host",
+ "license": "SEE LICENSE IN LICENSE",
+ "author": "trtrojo",
+ "private": "true",
+ "repository" : {
+  "type": "git",
+  "url": ""
+ },
+ "dependencies":{
+  "express":"4.13.4"
+ }
+}
