@@ -4,12 +4,16 @@
  "description": "Echo IP/Hostname information back to connecting host",
  "license": "SEE LICENSE IN LICENSE",
  "author": "trtrojo",
- "private": "true",
+ "private": "false",
  "repository" : {
   "type": "git",
   "url": ""
  },
+ "scripts": {
+  "start":"node echoHost.js"
+ },
  "dependencies":{
-  "express":"4.13.4"
+  "express":"4.13.4",
+  "bowser":"1.2.0"
  }
 }
