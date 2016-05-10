@@ -1,6 +1,6 @@
 {
  "name": "echoHostname",
- "version": "0.0.2",
+ "version": "0.0.3",
  "description": "Echo IP/Hostname information back to connecting host",
  "license": "MIT",
  "author": "trtrojo",

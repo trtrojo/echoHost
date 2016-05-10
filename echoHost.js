@@ -10,6 +10,8 @@ var env = require("./config.js")
 
 var express = require("express");
 var fs = require("fs");
+var dns = require("dns");
+var util = require("util");
 
 var app = express();
 
@@ -20,25 +22,27 @@ app.listen(env.port,function(){
 
 app.route("/")
  .get(function(req,res){
-   var s = ("You are " + req.headers.host + " at " + req.connection.remoteAddress + "\n" + "User Agent: " + req.headers["user-agent"]);
-   
-   /*
-    * Note: Gecko-based browsers (like firefox) dont like the text/log header, so send <pre> tag for them
-    *
-    */
-   if (geckoMatch(req.headers["user-agent"])) {
-    res.send("<pre>" + s);
-   }
-    else {
-     res.writeHead(200, {'Content-Type': 'text/log'});
-     res.end(s);
-     //write2log(util.inspect(req));
+   dns.reverse(req.connection.remoteAddress,function(err,domains){
+     var s = ("You are " + req.headers.host + " at " + req.connection.remoteAddress + "\n" + "User Agent: " + req.headers["user-agent"]);
+    
+    /*
+     * Note: Gecko-based browsers (like firefox) dont like the text/log header, so send <pre> tag for them
+     *
+     */
+    if (geckoMatch(req.headers["user-agent"])) {
+     res.send("<pre>" + s);
     }
-  if (env.logQuery) {
-   write2log(req);
-  }
- });
-
+     else {
+      res.writeHead(200, {'Content-Type': 'text/log'});
+      res.end(s);
+     }
+   if (env.logQuery) {
+    write2log(req);
+   }
+  fs.appendFile(__dirname+"test.log",util.inspect(req),function(err){});
+   });
+  });
+ 
 app.route("/access.log")
  .get(function(req,res){
   if (env.logVisible){
