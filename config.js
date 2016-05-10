@@ -1,7 +1,3 @@
-/*
- * Testing comments as well
- *
- */
 module.exports = {
  "port" : "4000",
  "logQuery" : true,
