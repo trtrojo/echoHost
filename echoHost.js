@@ -9,7 +9,6 @@
 var env = require("./config.js")
 
 var express = require("express");
-var bowser = require("bowser");
 var fs = require("fs");
 
 var app = express();
