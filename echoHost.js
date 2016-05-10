@@ -51,7 +51,7 @@ app.route("/access.log")
 
 function write2log(req){
  var s = "At " + (new Date()) + " logged " + req.headers.host + " at " + req.connection.remoteAddress + " User Agent: " + req.headers["user-agent"] + "\n";
- fs.appendFile(env.logFile,s,function(err){
+ fs.appendFile(__dirname+env.logFile,s,function(err){
   if (err) { 
    console.log(err);
   }
