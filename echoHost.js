@@ -7,7 +7,6 @@
 
 
 var env = require("./config.js")
-
 var express = require("express");
 var fs = require("fs");
 var dns = require("dns");
@@ -20,28 +19,47 @@ app.listen(env.port,function(){
  console.log("[INFO] Hostname Logging: " + env.logQuery);
 });
 
+
+
+
 app.route("/")
  .get(function(req,res){
-   dns.reverse(req.connection.remoteAddress,function(err,domains){
-     var s = ("You are " + req.headers.host + " at " + req.connection.remoteAddress + "\n" + "User Agent: " + req.headers["user-agent"]);
-    
+   if(env.useXForwardedFor){ 
+    var remoteAddr = req.headers["x-forwarded-for"]; 
+   } 
+    else { 
+     var remoteAddr = req.connection.remoteAddress; 
+    };
+   dns.reverse(remoteAddr,function(err,hostnames){
+    if (env.useXForwardedFor) {
+     var s = { "hostname" : hostnames, "ipaddr" : req.headers["x-forwarded-for"], "agentString" : req.headers["user-agent"] }
+    }
+     else {
+      var s = { "hostname" : hostnames, "ipaddr" : req.connection.remoteAddress, "agentString" : req.headers["user-agent"] }
+     }
+
     /*
      * Note: Gecko-based browsers (like firefox) dont like the text/log header, so send <pre> tag for them
      *
      */
     if (geckoMatch(req.headers["user-agent"])) {
-     res.send("<pre>" + s);
+     res.send("<pre>"+"You are");
     }
      else {
       res.writeHead(200, {'Content-Type': 'text/log'});
-      res.end(s);
+      res.end(util.inspect(s));
      }
    if (env.logQuery) {
-    write2log(req);
+    //write2log(s);
    }
-  fs.appendFile(__dirname+"test.log",util.inspect(req),function(err){});
-   });
   });
+ });
+
+
+
+
+
+
  
 app.route("/access.log")
  .get(function(req,res){
@@ -55,6 +73,7 @@ app.route("/access.log")
 
 function write2log(req){
  var s = "At " + (new Date()) + " logged " + req.headers.host + " at " + req.connection.remoteAddress + " User Agent: " + req.headers["user-agent"] + "\n";
+ console.log(s);
  fs.appendFile(__dirname+env.logFile,s,function(err){
   if (err) { 
    console.log(err);
