@@ -19,24 +19,23 @@ app.listen(env.port,function(){
  console.log("[INFO] Hostname Logging: " + env.logQuery);
 });
 
-
-
-
 app.route("/")
  .get(function(req,res){
-   if(env.useXForwardedFor){ 
-    var remoteAddr = req.headers["x-forwarded-for"]; 
-   } 
-    else { 
-     var remoteAddr = req.connection.remoteAddress; 
-    };
-   dns.reverse(remoteAddr,function(err,hostnames){
-    if (env.useXForwardedFor) {
-     var s = { "hostname" : hostnames, "ipaddr" : req.headers["x-forwarded-for"], "agentString" : req.headers["user-agent"] }
+  if(env.useXForwardedFor){ 
+   var remoteAddr = req.headers["x-forwarded-for"]; 
+  } 
+   else { 
+    var remoteAddr = req.connection.remoteAddress; 
+   };
+  dns.reverse(remoteAddr,function(dnserr,hostnames){
+   if (env.useXForwardedFor) {
+    var s = { "hostname" : hostnames, "ipaddr" : req.headers["x-forwarded-for"], "agentString" : req.headers["user-agent"] }
+   }
+    else {
+     var s = { "hostname" : hostnames, "ipaddr" : req.connection.remoteAddress, "agentString" : req.headers["user-agent"] }
     }
-     else {
-      var s = { "hostname" : hostnames, "ipaddr" : req.connection.remoteAddress, "agentString" : req.headers["user-agent"] }
-     }
+   
+   if (dnserr) { s.hostname = "Hostname not found" };
 
     /*
      * Note: Gecko-based browsers (like firefox) dont like the text/log header, so send <pre> tag for them
