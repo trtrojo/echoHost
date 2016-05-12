@@ -10,7 +10,6 @@ var env = require("./config.js")
 var express = require("express");
 var fs = require("fs");
 var dns = require("dns");
-var util = require("util");
 
 var app = express();
 
