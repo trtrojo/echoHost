@@ -21,45 +21,42 @@ app.listen(env.port,function(){
 
 app.route("/")
  .get(function(req,res){
+  var s = { "hostname":"","ipaddr":"","agentstring":"" };
+
   if(env.useXForwardedFor){ 
    var remoteAddr = req.headers["x-forwarded-for"]; 
   } 
    else { 
     var remoteAddr = req.connection.remoteAddress; 
    };
+
   dns.reverse(remoteAddr,function(dnserr,hostnames){
+   if (dnserr || hostnames[0] == null) { s.hostname = "Hostname not found" }
+    else { s.hostname = hostnames[0]; };
    if (env.useXForwardedFor) {
-    var s = { "hostname" : hostnames, "ipaddr" : req.headers["x-forwarded-for"], "agentString" : req.headers["user-agent"] }
+    s = { "hostname":s.hostname, "ipaddr" : req.headers["x-forwarded-for"], "agentstring" : req.headers["user-agent"] }
    }
     else {
-     var s = { "hostname" : hostnames, "ipaddr" : req.connection.remoteAddress, "agentString" : req.headers["user-agent"] }
+     s = { "hostname":s.hostname, "ipaddr" : req.connection.remoteAddress, "agentstring" : req.headers["user-agent"] }
     }
    
-   if (dnserr) { s.hostname = "Hostname not found" };
-
     /*
      * Note: Gecko-based browsers (like firefox) dont like the text/log header, so send <pre> tag for them
      *
      */
     if (geckoMatch(req.headers["user-agent"])) {
-     res.send("<pre>"+"You are");
+     res.send("<pre>"+"You are "+s.hostname+" at "+s.ipaddr+"\nUser Agent:"+s.agentstring);
     }
      else {
       res.writeHead(200, {'Content-Type': 'text/log'});
-      res.end(util.inspect(s));
+      res.end("You are "+s.hostname+" at "+s.ipaddr+"\nUser Agent:"+s.agentstring);
      }
    if (env.logQuery) {
-    //write2log(s);
+    write2log(s);
    }
   });
  });
 
-
-
-
-
-
- 
 app.route("/access.log")
  .get(function(req,res){
   if (env.logVisible){
@@ -70,13 +67,13 @@ app.route("/access.log")
    }
  });
 
-function write2log(req){
- var s = "At " + (new Date()) + " logged " + req.headers.host + " at " + req.connection.remoteAddress + " User Agent: " + req.headers["user-agent"] + "\n";
- console.log(s);
- fs.appendFile(__dirname+env.logFile,s,function(err){
+function write2log(input){
+ var t = "At " + (new Date()) + " logged " + input.hostname + " at " + input.ipaddr + " User Agent: " + input.agentstring + "\n";
+ console.log(t);
+ fs.appendFile(__dirname+"/access.log",t,function(err){
   if (err) { 
    console.log(err);
-  }
+  };
  });
 };
 
