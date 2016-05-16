@@ -48,7 +48,7 @@ app.route("/")
     }
      else {
       res.writeHead(200, {'Content-Type': 'text/log'});
-      res.end("You are "+s.hostname+" at "+s.ipaddr+"\nUser Agent:"+s.agentstring);
+      res.end("You are "+s.hostname+" at "+s.ipaddr+"\nUser Agent:"+s.agentstring+"\n");
      }
    if (env.logQuery) {
     write2log(s);
