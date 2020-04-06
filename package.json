@@ -5,6 +5,7 @@
  "license": "MIT",
  "author": "trtrojo",
  "private": "false",
+ "start": "node echoHost.js",
  "repository" : {
   "type": "git",
   "url": ""

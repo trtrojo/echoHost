@@ -10,6 +10,7 @@ var env = require("./config.js")
 var express = require("express");
 var fs = require("fs");
 var dns = require("dns");
+var port = process.env.PORT || env.port;
 
 var app = express();
 
